@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickBite | Premium Food Delivery</title>
+    <style>
+        /* --- STYLING --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        :root { --primary: #e74c3c; --dark: #2d3436; --light: #f9f9f9; }
+        body { background-color: var(--light); color: var(--dark); line-height: 1.6; }
+
+        /* Navigation */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 10%; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { font-size: 28px; font-weight: 800; cursor: pointer; }
+        .logo span { color: var(--primary); }
+        nav ul { display: flex; list-style: none; align-items: center; }
+        nav ul li { margin-left: 25px; }
+        nav ul li a { text-decoration: none; color: var(--dark); font-weight: 500; cursor: pointer; }
+        
+        .cart-icon {
+            background: var(--primary); color: white; padding: 8px 15px;
+            border-radius: 20px; font-weight: bold; cursor: pointer;
+        }
+
+        /* Page Transitions */
+        .page { display: none; padding: 40px 10%; min-height: 80vh; animation: fadeIn 0.4s; }
+        .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Home Hero */
+        .hero {
+            height: 50vh; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center; color: white; border-radius: 20px;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200');
+            background-size: cover; background-position: center;
+        }
+
+        /* Menu Section */
+        .search-container { max-width: 500px; margin: 0 auto 30px auto; }
+        #menuSearch { width: 100%; padding: 12px 20px; border-radius: 30px; border: 2px solid #ddd; outline: none; }
+        
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; }
+        .menu-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; }
+        .menu-card:hover { transform: translateY(-5px); }
+        .menu-card.hidden { display: none; }
+        .menu-card img { width: 100%; height: 180px; object-fit: cover; }
+        .card-info { padding: 15px; }
+        .price { color: var(--primary); font-weight: 700; font-size: 1.2rem; display: block; margin: 10px 0; }
+        
+        .add-btn { width: 100%; padding: 10px; border: 1px solid var(--primary); background: transparent; color: var(--primary); font-weight: 600; border-radius: 8px; cursor: pointer; }
+        .add-btn:hover { background: var(--primary); color: white; }
+
+        /* Cart Page */
+        .cart-container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .cart-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .total-box { margin-top: 20px; text-align: right; font-size: 1.4rem; font-weight: bold; }
+        .checkout-btn { width: 100%; background: #27ae60; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 1rem; margin-top: 20px; cursor: pointer; }
+
+        .content-wrap { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 15px; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        footer { text-align: center; padding: 30px; color: #777; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo" onclick="showPage('home')">Quick<span>Bite</span></div>
+        <ul>
+            <li><a onclick="showPage('home')">Home</a></li>
+            <li><a onclick="showPage('menu')">Menu</a></li>
+            <li><a onclick="showPage('about')">About Us</a></li>
+            <li><a onclick="showPage('contact')">Contact</a></li>
+            <li><div class="cart-icon" onclick="showPage('cart')">Cart: <span id="cartCount">0</span></div></li>
+        </ul>
+    </nav>
+
+    <section id="home" class="page active">
+        <div class="hero">
+            <h1>Delicious Food, Delivered Fast.</h1>
+            <p>Order from top-rated restaurants near you.</p><br>
+            <button onclick="showPage('menu')" style="padding: 12px 30px; border-radius: 8px; border:none; background: var(--primary); color:white; cursor:pointer; font-weight:600;">Explore Menu</button>
+        </div>
+    </section>
+
+    <section id="menu" class="page">
+        <div class="search-container">
+            <input type="text" id="menuSearch" placeholder="Search for food..." onkeyup="filterMenu()">
+        </div>
+        <div class="menu-grid" id="menuGrid">
+            <div class="menu-card">
+                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500" alt="Burger">
+                <div class="card-info"><h3>Signature Burger</h3><p>Beef patty with cheddar.</p><span class="price">$12.99</span>
+                <button class="add-btn" onclick="addToCart('Signature Burger', 12.99)">Add to Cart</button></div>
+            </div>
+            <div class="menu-card">
+                <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500" alt="Pizza">
+                <div class="card-info"><h3>Truffle Pizza</h3><p>Mushroom & Truffle oil.</p><span class="price">$18.50</span>
+                <button class="add-btn" onclick="addToCart('Truffle Pizza', 18.50)">Add to Cart</button></div>
+            </div>
+            <div class="menu-card">
+                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500" alt="Salad">
+                <div class="card-info"><h3>Garden Salad</h3><p>Fresh organic greens.</p><span class="price">$10.00</span>
+                <button class="add-btn" onclick="addToCart('Garden Salad', 10.00)">Add to Cart</button></div>
+            </div>
+            <div class="menu-card">
+                <img src="https://images.unsplash.com/photo-1645112481338-3560e99b32fa?w=500" alt="Pasta">
+                <div class="card-info"><h3>Creamy Pasta</h3><p>Rich garlic cream sauce.</p><span class="price">$14.00</span>
+                <button class="add-btn" onclick="addToCart('Creamy Pasta', 14.00)">Add to Cart</button></div>
+            </div>
+            <div class="menu-card">
+                <img src="https://images.unsplash.com/photo-1512152272829-e3139592d56f?w=500" alt="Fries">
+                <div class="card-info"><h3>Loaded Fries</h3><p>Cheesy fries with bacon bits.</p><span class="price">$7.50</span>
+                <button class="add-btn" onclick="addToCart('Loaded Fries', 7.50)">Add to Cart</button></div>
+            </div>
+            <div class="menu-card">
+                <img src="https://images.unsplash.com/photo-1552611052-33e04de081de?w=500" alt="Sushi">
+                <div class="card-info"><h3>Salmon Sushi</h3><p>Fresh Atlantic salmon rolls.</p><span class="price">$22.00</span>
+                <button class="add-btn" onclick="addToCart('Salmon Sushi', 22.00)">Add to Cart</button></div>
+            </div>
+            <div class="menu-card">
+                <img src="https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?w=500" alt="Steak">
+                <div class="card-info"><h3>Ribeye Steak</h3><p>Grilled with garlic butter.</p><span class="price">$29.99</span>
+                <button class="add-btn" onclick="addToCart('Ribeye Steak', 29.99)">Add to Cart</button></div>
+            </div>
+            <div class="menu-card">
+                <img src="https://images.unsplash.com/photo-1551024601-bec78aea704b?w=500" alt="Donut">
+                <div class="card-info"><h3>Glazed Donuts</h3><p>Box of 3 classic donuts.</p><span class="price">$6.00</span>
+                <button class="add-btn" onclick="addToCart('Glazed Donuts', 6.00)">Add to Cart</button></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="cart" class="page">
+        <div class="cart-container">
+            <h2>Your Cart</h2><br>
+            <div id="cartItemsList">
+                <p>Your cart is empty.</p>
+            </div>
+            <div class="total-box">Total: $<span id="cartTotalPrice">0.00</span></div>
+            <button class="checkout-btn" onclick="alert('Order Placed Successfully!')">Proceed to Checkout</button>
+        </div>
+    </section>
+
+    <section id="about" class="page">
+        <div class="content-wrap"><h2>Our Story</h2><p>QuickBite was born from a love for great food and fast delivery. We partner with the best chefs to bring quality to your door.</p></div>
+    </section>
+
+    <section id="contact" class="page">
+        <div class="content-wrap">
+            <h2>Contact Us</h2>
+            <form onsubmit="event.preventDefault(); alert('Message Sent!');">
+                <input type="text" placeholder="Name" required>
+                <input type="email" placeholder="Email" required>
+                <textarea placeholder="Your Message"></textarea>
+                <button type="submit" class="checkout-btn" style="background: var(--primary);">Send</button>
+            </form>
+        </div>
+    </section>
+
+    <footer><p>&copy; 2026 QuickBite App</p></footer>
+
+    <script>
+        let cart = [];
+        let totalPrice = 0;
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function filterMenu() {
+            let input = document.getElementById('menuSearch').value.toLowerCase();
+            let cards = document.getElementsByClassName('menu-card');
+            for (let card of cards) {
+                let title = card.querySelector('h3').innerText.toLowerCase();
+                card.classList.toggle('hidden', !title.includes(input));
+            }
+        }
+
+        function addToCart(name, price) {
+            cart.push({name, price});
+            totalPrice += price;
+            updateCartUI();
+            alert(name + " added!");
+        }
+
+        function updateCartUI() {
+            document.getElementById('cartCount').innerText = cart.length;
+            const list = document.getElementById('cartItemsList');
+            const totalDisplay = document.getElementById('cartTotalPrice');
+            
+            if (cart.length === 0) {
+                list.innerHTML = "<p>Your cart is empty.</p>";
+            } else {
+                list.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <span>${item.name}</span>
+                        <span>$${item.price.toFixed(2)}</span>
+                    </div>
+                `).join('');
+            }
+            totalDisplay.innerText = totalPrice.toFixed(2);
+        }
+    </script>
+</body>
+</html>
